@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - Hostel Bill Manager Pro</title>
+    
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/x-icon" href="icons/favicon.ico">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <meta name="theme-color" content="#6366F1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
+    <!-- Chart.js for advanced analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles/common.css">
+    <link rel="stylesheet" href="styles/analytics.css">
+    <link rel="stylesheet" href="styles/dark-mode.css">
+    <link rel="stylesheet" href="styles/animations.css">
+</head>
+<body class="light-theme">
+    <div class="container">
+        <header class="page-header">
+            <button class="back-btn" onclick="goBack()">←</button>
+            <h1>📈 Analytics</h1>
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </header>
+
+        <!-- Date Range Selector -->
+        <div class="analytics-controls">
+            <div class="controls-row">
+                <div class="date-range-selector">
+                    <label for="analyticsRange">📅 Time Period</label>
+                    <select id="analyticsRange" onchange="updateAnalytics()">
+                        <option value="all">All Time</option>
+                        <option value="month">This Month</option>
+                        <option value="last-month">Last Month</option>
+                        <option value="year">This Year</option>
+                        <option value="last-year">Last Year</option>
+                        <option value="quarter">Last 3 Months</option>
+                        <option value="half-year">Last 6 Months</option>
+                    </select>
+                </div>
+                
+                <button class="icon-btn refresh-btn" onclick="refreshAnalytics()" title="Refresh">
+                    <span>🔄</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="analytics-summary">
+            <div class="summary-card total-spent">
+                <div class="summary-icon">💰</div>
+                <div class="summary-info">
+                    <div class="summary-value" id="totalSpent">₹0</div>
+                    <div class="summary-label">Total Spent</div>
+                    <div class="summary-trend" id="spendingTrend">→</div>
+                </div>
+            </div>
+            
+            <div class="summary-card total-bills">
+                <div class="summary-icon">📊</div>
+                <div class="summary-info">
+                    <div class="summary-value" id="totalBills">0</div>
+                    <div class="summary-label">Total Bills</div>
+                    <div class="summary-trend" id="billsTrend">→</div>
+                </div>
+            </div>
+            
+            <div class="summary-card avg-bill">
+                <div class="summary-icon">📅</div>
+                <div class="summary-info">
+                    <div class="summary-value" id="avgPerBill">₹0</div>
+                    <div class="summary-label">Avg per Bill</div>
+                    <div class="summary-trend" id="avgTrend">→</div>
+                </div>
+            </div>
+            
+            <div class="summary-card budget-status">
+                <div class="summary-icon">🎯</div>
+                <div class="summary-info">
+                    <div class="summary-value" id="budgetUsed">0%</div>
+                    <div class="summary-label">Budget Used</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="budgetProgress"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Spending Overview Chart -->
+        <div class="analytics-section">
+            <div class="section-header">
+                <h3>📊 Spending Overview</h3>
+                <div class="chart-actions">
+                    <button class="btn-sm" onclick="exportChart('spendingChart')">
+                        📤 Export
+                    </button>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="spendingChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Category Breakdown -->
+        <div class="analytics-section">
+            <div class="section-header">
+                <h3>🏷️ Spending by Category</h3>
+                <button class="btn-sm" onclick="toggleChartView('categoryChart')">
+                    🔄 Toggle View
+                </button>
+            </div>
+            <div class="chart-container">
+                <canvas id="categoryChart"></canvas>
+            </div>
+            <div class="category-list" id="categoryList">
+                <!-- Category breakdown list -->
+            </div>
+        </div>
+
+        <!-- Participant Breakdown -->
+        <div class="analytics-section">
+            <div class="section-header">
+                <h3>👥 Spending by Person</h3>
+            </div>
+            <div class="chart-container">
+                <canvas id="participantChart"></canvas>
+            </div>
+            <div class="participant-list" id="participantList">
+                <!-- Participant breakdown list -->
+            </div>
+        </div>
+
+        <!-- Monthly Trend -->
+        <div class="analytics-section">
+            <div class="section-header">
+                <h3>📅 Monthly Trend</h3>
+                <button class="btn-sm" onclick="toggleChartView('monthlyChart')">
+                    🔄 Toggle View
+                </button>
+            </div>
+            <div class="chart-container">
+                <canvas id="monthlyChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Settlements Overview -->
+        <div class="analytics-section">
+            <div class="section-header">
+                <h3>💸 Current Settlements</h3>
+                <button class="btn-sm" onclick="recalculateSettlements()">
+                    🔄 Recalculate
+                </button>
+            </div>
+            <div id="settlementsList" class="settlements-container">
+                <!-- Settlements will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Insights & Recommendations -->
+        <div class="analytics-section insights-section">
+            <div class="section-header">
+                <h3>💡 Insights & Recommendations</h3>
+                <button class="btn-sm" onclick="refreshInsights()">
+                    🔄 Refresh
+                </button>
+            </div>
+            <div id="insightsList" class="insights-list">
+                <!-- AI-powered insights will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Export & Actions -->
+        <div class="analytics-actions">
+            <button class="btn-primary" onclick="exportAnalyticsReport()">
+                <span>📊</span> Export Full Report
+            </button>
+            <button class="btn-secondary" onclick="shareAnalytics()">
+                <span>📤</span> Share Insights
+            </button>
+            <button class="btn-secondary" onclick="refreshAnalytics()">
+                <span>🔄</span> Refresh Data
+            </button>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p>Crunching numbers...</p>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div id="exportModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📤 Export Analytics</h3>
+                <button class="close-modal" onclick="closeExportModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="export-options">
+                    <div class="export-option">
+                        <input type="radio" id="exportSummary" name="exportType" value="summary" checked>
+                        <label for="exportSummary">
+                            <span class="option-icon">📊</span>
+                            <div class="option-info">
+                                <div class="option-title">Summary Report</div>
+                                <div class="option-description">Key metrics and insights</div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="export-option">
+                        <input type="radio" id="exportDetailed" name="exportType" value="detailed">
+                        <label for="exportDetailed">
+                            <span class="option-icon">📈</span>
+                            <div class="option-info">
+                                <div class="option-title">Detailed Report</div>
+                                <div class="option-description">Complete analytics with charts</div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="export-option">
+                        <input type="radio" id="exportCharts" name="exportType" value="charts">
+                        <label for="exportCharts">
+                            <span class="option-icon">🖼️</span>
+                            <div class="option-info">
+                                <div class="option-title">Charts Only</div>
+                                <div class="option-description">High-quality chart images</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="export-format">
+                    <label>Format:</label>
+                    <select id="exportFormat">
+                        <option value="pdf">PDF Document</option>
+                        <option value="excel">Excel Spreadsheet</option>
+                        <option value="json">JSON Data</option>
+                    </select>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="btn-primary" onclick="performAnalyticsExport()">
+                        📤 Export
+                    </button>
+                    <button class="btn-secondary" onclick="closeExportModal()">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/analytics.js"></script>
+    <script src="js/theme.js"></script>
+</body>
+</html>
