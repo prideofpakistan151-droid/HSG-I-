@@ -1,0 +1,251 @@
+/* Dark Mode Specific Styles */
+
+.dark-theme {
+    /* Enhanced dark theme colors */
+    --bg-primary: #0F172A;
+    --bg-secondary: #1E293B;
+    --bg-card: #1E293B;
+    --bg-overlay: rgba(0, 0, 0, 0.8);
+    --text-primary: #F1F5F9;
+    --text-secondary: #94A3B8;
+    --text-muted: #64748B;
+    --border-color: #334155;
+    
+    /* Enhanced shadows for dark mode */
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 6px 10px -1px rgba(0, 0, 0, 0.4), 0 2px 6px -1px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+}
+
+/* Dark theme specific adjustments */
+.dark-theme .menu-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+}
+
+.dark-theme .menu-card:hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.dark-theme .menu-card.previous-bills {
+    background: var(--bg-card);
+    color: var(--text-primary);
+}
+
+.dark-theme .stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+}
+
+.dark-theme .quick-actions,
+.dark-theme .recent-activity,
+.dark-theme .upcoming-bills {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+}
+
+.dark-theme .activity-item {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.dark-theme .activity-item:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+.dark-theme .search-input-wrapper {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+}
+
+.dark-theme .search-input-wrapper:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.dark-theme input,
+.dark-theme textarea,
+.dark-theme select {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.dark-theme input:focus,
+.dark-theme textarea:focus,
+.dark-theme select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.dark-theme .icon-btn {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+}
+
+.dark-theme .icon-btn:hover {
+    border-color: var(--primary);
+    background: var(--bg-card);
+}
+
+.dark-theme .btn-secondary {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.dark-theme .btn-secondary:hover {
+    border-color: var(--primary);
+    background: var(--bg-card);
+}
+
+.dark-theme .modal-content {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+}
+
+.dark-theme .modal-header {
+    border-bottom-color: var(--border-color);
+}
+
+.dark-theme .close-modal:hover {
+    background: var(--bg-secondary);
+}
+
+/* Enhanced dark mode transitions */
+.dark-theme .menu-card,
+.dark-theme .stat-card,
+.dark-theme input,
+.dark-theme textarea,
+.dark-theme select,
+.dark-theme .btn-secondary {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Dark mode scrollbar */
+.dark-theme ::-webkit-scrollbar {
+    width: 8px;
+}
+
+.dark-theme ::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+.dark-theme ::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+.dark-theme ::-webkit-scrollbar-thumb:hover {
+    background: var(--gray-500);
+}
+
+/* Selection color in dark mode */
+.dark-theme ::selection {
+    background: rgba(99, 102, 241, 0.3);
+    color: var(--text-primary);
+}
+
+.dark-theme ::-moz-selection {
+    background: rgba(99, 102, 241, 0.3);
+    color: var(--text-primary);
+}
+
+/* Placeholder text in dark mode */
+.dark-theme ::placeholder {
+    color: var(--text-muted);
+}
+
+.dark-theme :-ms-input-placeholder {
+    color: var(--text-muted);
+}
+
+.dark-theme ::-ms-input-placeholder {
+    color: var(--text-muted);
+}
+
+/* Loading screen in dark mode */
+.dark-theme .loading-screen {
+    background: var(--bg-primary);
+}
+
+.dark-theme .loading-spinner {
+    border-color: var(--border-color);
+    border-top-color: var(--primary);
+}
+
+/* Notification adjustments for dark mode */
+.dark-theme .notification {
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Voice visualizer in dark mode */
+.dark-theme .voice-visualizer {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+}
+
+/* Progress bars in dark mode */
+.dark-theme .progress-bar {
+    background: var(--bg-secondary);
+}
+
+/* Activity icons in dark mode maintain their colors */
+.dark-theme .activity-icon.food,
+.dark-theme .activity-icon.groceries,
+.dark-theme .activity-icon.utilities,
+.dark-theme .activity-icon.rent,
+.dark-theme .activity-icon.transport,
+.dark-theme .activity-icon.entertainment,
+.dark-theme .activity-icon.other {
+    /* These keep their gradient backgrounds */
+    filter: brightness(0.9);
+}
+
+/* Focus indicators for accessibility */
+.dark-theme *:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* Reduced motion support for dark mode */
+@media (prefers-reduced-motion: reduce) {
+    .dark-theme * {
+        transition: none !important;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .dark-theme {
+        --bg-primary: #000000;
+        --bg-secondary: #111111;
+        --bg-card: #222222;
+        --text-primary: #FFFFFF;
+        --text-secondary: #CCCCCC;
+        --border-color: #444444;
+    }
+}
+
+/* Print styles for dark mode */
+@media print {
+    .dark-theme {
+        --bg-primary: #FFFFFF;
+        --bg-card: #FFFFFF;
+        --text-primary: #000000;
+        --text-secondary: #666666;
+        --border-color: #CCCCCC;
+    }
+    
+    .dark-theme .menu-card,
+    .dark-theme .stat-card,
+    .dark-theme .quick-actions,
+    .dark-theme .recent-activity {
+        background: white !important;
+        border: 1px solid #CCCCCC !important;
+        color: black !important;
+    }
+}
