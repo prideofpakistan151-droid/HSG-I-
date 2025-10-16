@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget - Hostel Bill Manager Pro</title>
+    
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/x-icon" href="icons/favicon.ico">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <meta name="theme-color" content="#6366F1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
+    <!-- Chart.js for budget visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles/common.css">
+    <link rel="stylesheet" href="styles/budget.css">
+    <link rel="stylesheet" href="styles/dark-mode.css">
+    <link rel="stylesheet" href="styles/animations.css">
+</head>
+<body class="light-theme">
+    <div class="container">
+        <header class="page-header">
+            <button class="back-btn" onclick="goBack()">←</button>
+            <h1>🎯 Budget</h1>
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </header>
+
+        <!-- Budget Overview -->
+        <div class="budget-overview">
+            <div class="budget-card total-budget">
+                <div class="budget-icon">💰</div>
+                <div class="budget-info">
+                    <div class="budget-label">Monthly Budget</div>
+                    <div class="budget-amount" id="totalBudget">₹0</div>
+                    <div class="budget-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="budgetProgressFill"></div>
+                        </div>
+                        <div class="progress-text" id="budgetProgressText">0% used</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="budget-card spent-amount">
+                <div class="budget-icon">💸</div>
+                <div class="budget-info">
+                    <div class="budget-label">Spent This Month</div>
+                    <div class="budget-amount" id="spentAmount">₹0</div>
+                    <div class="budget-daily" id="dailyAverage">₹0/day</div>
+                </div>
+            </div>
+            
+            <div class="budget-card remaining-amount">
+                <div class="budget-icon">✅</div>
+                <div class="budget-info">
+                    <div class="budget-label">Remaining</div>
+                    <div class="budget-amount" id="remainingAmount">₹0</div>
+                    <div class="budget-days" id="remainingDays">0 days left</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Budget Setup -->
+        <div class="budget-section">
+            <div class="section-header">
+                <h3>🎯 Set Monthly Budget</h3>
+            </div>
+            <div class="budget-setup">
+                <div class="form-group">
+                    <label for="monthlyBudget">Monthly Budget Amount</label>
+                    <div class="input-with-suffix">
+                        <input type="number" id="monthlyBudget" placeholder="0.00" step="0.01" min="0">
+                        <span class="input-suffix">₹</span>
+                    </div>
+                </div>
+                <button class="btn-primary" onclick="saveBudget()">
+                    💾 Save Budget
+                </button>
+            </div>
+        </div>
+
+        <!-- Category Budgets -->
+        <div class="budget-section">
+            <div class="section-header">
+                <h3>🏷️ Category Budgets</h3>
+                <button class="btn-sm" onclick="showCategoryBudgetModal()">
+                    ➕ Add Category Budget
+                </button>
+            </div>
+            <div class="category-budgets" id="categoryBudgets">
+                <!-- Category budgets will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Budget Progress Chart -->
+        <div class="budget-section">
+            <div class="section-header">
+                <h3>📊 Budget Progress</h3>
+                <button class="btn-sm" onclick="toggleChartView('budgetChart')">
+                    🔄 Toggle View
+                </button>
+            </div>
+            <div class="chart-container">
+                <canvas id="budgetChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Spending Alerts -->
+        <div class="budget-section">
+            <div class="section-header">
+                <h3>🔔 Spending Alerts</h3>
+                <button class="btn-sm" onclick="toggleAlerts()">
+                    🔄 Toggle
+                </button>
+            </div>
+            <div class="alerts-list" id="alertsList">
+                <!-- Alerts will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Budget Tips -->
+        <div class="budget-section tips-section">
+            <div class="section-header">
+                <h3>💡 Budget Tips</h3>
+            </div>
+            <div class="tips-list" id="tipsList">
+                <!-- Tips will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Budget Modal -->
+    <div id="categoryBudgetModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🏷️ Set Category Budget</h3>
+                <button class="close-modal" onclick="closeCategoryBudgetModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="budgetCategory">Category</label>
+                    <select id="budgetCategory">
+                        <option value="food">🍕 Food & Dining</option>
+                        <option value="groceries">🛒 Groceries</option>
+                        <option value="utilities">⚡ Utilities</option>
+                        <option value="rent">🏠 Rent</option>
+                        <option value="transport">🚗 Transport</option>
+                        <option value="entertainment">🎬 Entertainment</option>
+                        <option value="other">📦 Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="categoryBudgetAmount">Budget Amount</label>
+                    <div class="input-with-suffix">
+                        <input type="number" id="categoryBudgetAmount" placeholder="0.00" step="0.01" min="0">
+                        <span class="input-suffix">₹</span>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn-primary" onclick="saveCategoryBudget()">
+                        💾 Save
+                    </button>
+                    <button class="btn-secondary" onclick="closeCategoryBudgetModal()">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/budget.js"></script>
+    <script src="js/theme.js"></script>
+</body>
+</html>
