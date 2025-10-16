@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hostel Bill Manager Pro</title>
+    
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/x-icon" href="icons/favicon.ico">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <meta name="theme-color" content="#6366F1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles/common.css">
+    <link rel="stylesheet" href="styles/home.css">
+    <link rel="stylesheet" href="styles/dark-mode.css">
+    <link rel="stylesheet" href="styles/animations.css">
+</head>
+<body class="light-theme">
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <div class="app-logo">
+                <div class="logo-icon">💰</div>
+                <h1>Bill Manager</h1>
+            </div>
+            <div class="loading-spinner"></div>
+            <p>Getting your expenses ready...</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Enhanced Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="header-text">
+                    <h1>💰 Hostel Bill Manager</h1>
+                    <p>Track, split & analyze expenses</p>
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn search-btn" onclick="toggleSearch()" title="Search">
+                        <span>🔍</span>
+                    </button>
+                    <button class="icon-btn theme-toggle" onclick="toggleTheme()" title="Toggle Theme">
+                        <span class="theme-icon">🌙</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Search Bar -->
+            <div class="search-container" id="searchContainer" style="display: none;">
+                <div class="search-input-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="globalSearch" placeholder="Search bills, amounts, categories..." 
+                           onkeyup="performGlobalSearch(this.value)">
+                    <button class="clear-search" onclick="clearSearch()">✕</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Quick Stats Dashboard -->
+        <div class="dashboard">
+            <div class="stat-cards">
+                <div class="stat-card primary">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="totalBills">0</div>
+                        <div class="stat-label">Total Bills</div>
+                    </div>
+                    <div class="stat-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card success">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="totalAmount">₹0</div>
+                        <div class="stat-label">Total Spent</div>
+                    </div>
+                    <div class="stat-trend" id="amountTrend">→</div>
+                </div>
+                
+                <div class="stat-card warning">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="activeUsers">5</div>
+                        <div class="stat-label">Roommates</div>
+                    </div>
+                </div>
+
+                <!-- Monthly Budget Card -->
+                <div class="stat-card info" onclick="navigateTo('budget.html')">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="budgetStatus">₹0</div>
+                        <div class="stat-label">Budget Left</div>
+                    </div>
+                    <div class="stat-budget-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill budget" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Navigation Grid -->
+        <div class="main-menu">
+            <div class="menu-card new-bill" onclick="navigateTo('new-bill.html')">
+                <div class="card-icon">➕</div>
+                <h3>New Bill</h3>
+                <p>Create expense entry</p>
+                <div class="card-badge">Quick</div>
+                <div class="card-pulse"></div>
+            </div>
+
+            <div class="menu-card previous-bills" onclick="navigateTo('previous-bills.html')">
+                <div class="card-icon">📋</div>
+                <h3>Bill History</h3>
+                <p>View all calculations</p>
+                <div class="card-badge" id="recentBillsBadge">0 new</div>
+            </div>
+
+            <div class="menu-card analytics" onclick="navigateTo('analytics.html')">
+                <div class="card-icon">📈</div>
+                <h3>Analytics</h3>
+                <p>Spending insights</p>
+                <div class="card-badge">AI Powered</div>
+            </div>
+
+            <!-- Quick Split Card -->
+            <div class="menu-card quick-split" onclick="startQuickSplit()">
+                <div class="card-icon">⚡</div>
+                <h3>Quick Split</h3>
+                <p>Instant bill division</p>
+                <div class="card-badge">Fast</div>
+            </div>
+
+            <div class="menu-card categories" onclick="navigateTo('categories.html')">
+                <div class="card-icon">🏷️</div>
+                <h3>Categories</h3>
+                <p>Manage expenses</p>
+            </div>
+
+            <div class="menu-card settings" onclick="navigateTo('settings.html')">
+                <div class="card-icon">⚙️</div>
+                <h3>Settings</h3>
+                <p>App preferences</p>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <h3>Quick Actions</h3>
+            <div class="action-buttons">
+                <button class="btn-secondary" onclick="navigateTo('calculator.html')">
+                    <span>🧮</span> Quick Calculator
+                </button>
+                <button class="btn-secondary" onclick="showSettlement()">
+                    <span>💸</span> Check Settlements
+                </button>
+                <!-- Voice Input -->
+                <button class="btn-secondary" onclick="startVoiceInput()">
+                    <span>🎤</span> Voice Input
+                </button>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="recent-activity">
+            <div class="activity-header">
+                <h3>Recent Activity</h3>
+                <div class="activity-filters">
+                    <select id="activityFilter" onchange="filterActivity()">
+                        <option value="all">All</option>
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                    </select>
+                </div>
+            </div>
+            <div id="recentActivityList" class="activity-list">
+                <!-- Dynamic content -->
+            </div>
+        </div>
+
+        <!-- Upcoming Bills Section -->
+        <div class="upcoming-bills" id="upcomingBillsSection" style="display: none;">
+            <h3>📅 Upcoming Bills</h3>
+            <div id="upcomingBillsList" class="upcoming-list"></div>
+        </div>
+    </div>
+
+    <!-- Enhanced Notification System -->
+    <div class="notification" id="notification"></div>
+
+    <!-- Voice Input Interface -->
+    <div id="voiceInputModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🎤 Voice Input</h3>
+                <button class="close-modal" onclick="closeVoiceInput()">✕</button>
+            </div>
+            <div class="voice-input-container">
+                <div class="voice-visualizer" id="voiceVisualizer"></div>
+                <p id="voiceStatus">Click the microphone and speak...</p>
+                <button class="btn-primary voice-btn" onclick="toggleVoiceRecognition()">
+                    <span id="voiceIcon">🎤</span>
+                    <span id="voiceText">Start Speaking</span>
+                </button>
+                <div class="voice-examples">
+                    <p>Try saying:</p>
+                    <ul>
+                        <li>"Food bill 500 rupees for me and John"</li>
+                        <li>"Add 300 for dinner with everyone"</li>
+                        <li>"Bill amount 750 split between 3 people"</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/app.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/voice.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show loading screen
+            setTimeout(() => {
+                document.getElementById('loadingScreen').style.display = 'none';
+                loadDashboardData();
+                loadRecentActivity();
+                loadUpcomingBills();
+                initServiceWorker();
+                checkOfflineStatus();
+            }, 1500);
+        });
+
+        function loadDashboardData() {
+            const bills = getBills();
+            const totalAmount = bills.reduce((sum, bill) => sum + (bill.totalAmount || 0), 0);
+            const monthlyBudget = getMonthlyBudget();
+            
+            document.getElementById('totalBills').textContent = bills.length;
+            document.getElementById('totalAmount').textContent = `₹${totalAmount.toFixed(2)}`;
+            
+            // Calculate budget progress
+            if (monthlyBudget > 0) {
+                const progress = Math.min((totalAmount / monthlyBudget) * 100, 100);
+                const remaining = Math.max(monthlyBudget - totalAmount, 0);
+                document.getElementById('budgetStatus').textContent = `₹${remaining.toFixed(2)}`;
+                document.querySelector('.progress-fill.budget').style.width = `${progress}%`;
+                
+                // Change color based on budget usage
+                if (progress > 80) {
+                    document.querySelector('.progress-fill.budget').style.background = 'var(--danger)';
+                } else if (progress > 60) {
+                    document.querySelector('.progress-fill.budget').style.background = 'var(--warning)';
+                }
+            }
+            
+            const recentBills = bills.filter(bill => 
+                new Date(bill.createdAt) > new Date(Date.now() - 24 * 60 * 60 * 1000)
+            );
+            document.getElementById('recentBillsBadge').textContent = `${recentBills.length} new`;
+            
+            // Update progress bars with animation
+            animateProgressBars();
+        }
+
+        function loadRecentActivity() {
+            const bills = getBills().slice(0, 5);
+            const activityList = document.getElementById('recentActivityList');
+            
+            if (bills.length === 0) {
+                activityList.innerHTML = `
+                    <div class="empty-activity">
+                        <div class="empty-icon">📊</div>
+                        <p>No recent activity</p>
+                        <button class="btn-secondary" onclick="navigateTo('new-bill.html')">
+                            Create Your First Bill
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            activityList.innerHTML = bills.map(bill => `
+                <div class="activity-item" onclick="viewBill('${bill.id}')">
+                    <div class="activity-icon ${bill.category}">${getCategoryIcon(bill.category)}</div>
+                    <div class="activity-details">
+                        <div class="activity-title">${bill.name}</div>
+                        <div class="activity-meta">
+                            ${new Date(bill.date).toLocaleDateString()} • 
+                            ${bill.participants ? bill.participants.length + ' people' : 'Multiple entries'}
+                        </div>
+                    </div>
+                    <div class="activity-amount">₹${bill.totalAmount?.toFixed(2) || '0.00'}</div>
+                    <div class="activity-arrow">→</div>
+                </div>
+            `).join('');
+        }
+
+        function loadUpcomingBills() {
+            // Implementation for recurring bills
+            const upcoming = getUpcomingBills();
+            if (upcoming.length > 0) {
+                document.getElementById('upcomingBillsSection').style.display = 'block';
+                // Render upcoming bills
+            }
+        }
+
+        function toggleSearch() {
+            const searchContainer = document.getElementById('searchContainer');
+            searchContainer.style.display = searchContainer.style.display === 'none' ? 'block' : 'none';
+            if (searchContainer.style.display === 'block') {
+                document.getElementById('globalSearch').focus();
+            }
+        }
+
+        function performGlobalSearch(query) {
+            // Enhanced search functionality
+            const results = searchBills(query);
+            // Update UI with search results
+        }
+
+        function clearSearch() {
+            document.getElementById('globalSearch').value = '';
+            performGlobalSearch('');
+        }
+
+        function startQuickSplit() {
+            // Direct quick split without bill creation
+            navigateTo('quick-split.html');
+        }
+
+        function viewBill(billId) {
+            navigateTo(`bill-detail.html?id=${billId}`);
+        }
+
+        function animateProgressBars() {
+            const progressBars = document.querySelectorAll('.progress-fill');
+            progressBars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 500);
+            });
+        }
+
+        function checkOfflineStatus() {
+            if (!navigator.onLine) {
+                showNotification('You are currently offline', 'warning');
+            }
+            
+            window.addEventListener('online', () => {
+                showNotification('Connection restored', 'success');
+            });
+            
+            window.addEventListener('offline', () => {
+                showNotification('You are offline', 'warning');
+            });
+        }
+
+        function getCategoryIcon(category) {
+            const icons = {
+                'food': '🍕',
+                'groceries': '🛒',
+                'utilities': '⚡',
+                'rent': '🏠',
+                'transport': '🚗',
+                'entertainment': '🎬',
+                'other': '📦'
+            };
+            return icons[category] || '📁';
+        }
+
+        function filterActivity() {
+            const filter = document.getElementById('activityFilter').value;
+            // Implement filtering logic
+            loadRecentActivity(); // Reload with filter
+        }
+    </script>
+</body>
+</html>
