@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill History - Hostel Bill Manager Pro</title>
+    
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/x-icon" href="icons/favicon.ico">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <meta name="theme-color" content="#6366F1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles/common.css">
+    <link rel="stylesheet" href="styles/previous-bills.css">
+    <link rel="stylesheet" href="styles/dark-mode.css">
+    <link rel="stylesheet" href="styles/animations.css">
+</head>
+<body class="light-theme">
+    <div class="container">
+        <header class="page-header">
+            <button class="back-btn" onclick="goBack()">←</button>
+            <h1>Bill History</h1>
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </header>
+
+        <!-- Enhanced Controls -->
+        <div class="bills-controls">
+            <div class="controls-row">
+                <div class="search-bar">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchBills" placeholder="Search bills, amounts, categories..." 
+                           onkeyup="debouncedFilterBills()">
+                    <button class="clear-search" onclick="clearBillSearch()">✕</button>
+                </div>
+                
+                <button class="icon-btn filter-btn" onclick="toggleFilterPanel()" title="Filters">
+                    <span>🎛️</span>
+                </button>
+            </div>
+
+            <!-- Filter Panel -->
+            <div id="filterPanel" class="filter-panel" style="display: none;">
+                <div class="filter-group">
+                    <label>Category</label>
+                    <select id="categoryFilter" onchange="filterBills()">
+                        <option value="">All Categories</option>
+                        <option value="food">🍕 Food & Dining</option>
+                        <option value="groceries">🛒 Groceries</option>
+                        <option value="utilities">⚡ Utilities</option>
+                        <option value="rent">🏠 Rent</option>
+                        <option value="transport">🚗 Transport</option>
+                        <option value="entertainment">🎬 Entertainment</option>
+                        <option value="other">📦 Other</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Date Range</label>
+                    <select id="dateFilter" onchange="filterBills()">
+                        <option value="all">All Time</option>
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                        <option value="last-month">Last Month</option>
+                        <option value="year">This Year</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Sort By</label>
+                    <select id="sortFilter" onchange="filterBills()">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="amount-high">Amount (High to Low)</option>
+                        <option value="amount-low">Amount (Low to High)</option>
+                        <option value="name">Name (A-Z)</option>
+                    </select>
+                </div>
+
+                <div class="filter-actions">
+                    <button class="btn-sm" onclick="resetFilters()">Reset Filters</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="stats-overview" id="statsOverview" style="display: none;">
+            <div class="stat-item">
+                <span class="stat-label">Showing</span>
+                <span class="stat-value" id="showingCount">0</span>
+                <span class="stat-label">of</span>
+                <span class="stat-value" id="totalCount">0</span>
+                <span class="stat-label">bills</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Total:</span>
+                <span class="stat-value" id="filteredTotal">₹0.00</span>
+            </div>
+        </div>
+
+        <!-- Bills List -->
+        <div class="bills-list" id="billsList">
+            <!-- Bills will be loaded here dynamically -->
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState">
+            <div class="empty-icon">📋</div>
+            <h3>No Bills Yet</h3>
+            <p>You haven't created any bill calculations yet.</p>
+            <div class="empty-actions">
+                <button class="btn-primary" onclick="navigateTo('new-bill.html')">
+                    Create Your First Bill
+                </button>
+                <button class="btn-secondary" onclick="navigateTo('quick-split.html')">
+                    Try Quick Split
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading-state" id="loadingState">
+            <div class="loading-spinner"></div>
+            <p>Loading your bills...</p>
+        </div>
+
+        <!-- Bulk Actions -->
+        <div class="bulk-actions" id="bulkActions" style="display: none;">
+            <div class="bulk-info">
+                <span id="selectedCount">0</span> bills selected
+            </div>
+            <div class="bulk-buttons">
+                <button class="btn-sm btn-danger" onclick="deleteSelectedBills()">
+                    🗑️ Delete
+                </button>
+                <button class="btn-sm" onclick="clearSelection()">
+                    ✕ Clear
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div id="exportModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📤 Export Bills</h3>
+                <button class="close-modal" onclick="closeExportModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="export-options">
+                    <div class="export-option">
+                        <input type="radio" id="exportAll" name="exportScope" value="all" checked>
+                        <label for="exportAll">
+                            <span class="option-icon">📊</span>
+                            <div class="option-info">
+                                <div class="option-title">All Bills</div>
+                                <div class="option-description">Export complete bill history</div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="export-option">
+                        <input type="radio" id="exportFiltered" name="exportScope" value="filtered">
+                        <label for="exportFiltered">
+                            <span class="option-icon">🔍</span>
+                            <div class="option-info">
+                                <div class="option-title">Filtered Bills</div>
+                                <div class="option-description">Export currently filtered bills</div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="export-option">
+                        <input type="radio" id="exportSelected" name="exportScope" value="selected">
+                        <label for="exportSelected">
+                            <span class="option-icon">☑️</span>
+                            <div class="option-info">
+                                <div class="option-title">Selected Bills</div>
+                                <div class="option-description">Export only selected bills</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="export-format">
+                    <label>Format:</label>
+                    <select id="exportFormat">
+                        <option value="json">JSON (Complete Data)</option>
+                        <option value="csv">CSV (Spreadsheet)</option>
+                        <option value="pdf">PDF (Report)</option>
+                    </select>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="btn-primary" onclick="performExport()">
+                        📤 Export
+                    </button>
+                    <button class="btn-secondary" onclick="closeExportModal()">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <div class="fab-container">
+        <button class="fab" onclick="navigateTo('new-bill.html')">
+            <span>➕</span>
+        </button>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/previous-bills.js"></script>
+    <script src="js/theme.js"></script>
+</body>
+</html>
