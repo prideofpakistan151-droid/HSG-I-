@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Split - Hostel Bill Manager Pro</title>
+    
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/x-icon" href="icons/favicon.ico">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <meta name="theme-color" content="#6366F1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles/common.css">
+    <link rel="stylesheet" href="styles/quick-split.css">
+    <link rel="stylesheet" href="styles/dark-mode.css">
+    <link rel="stylesheet" href="styles/animations.css">
+</head>
+<body class="light-theme">
+    <div class="container">
+        <header class="page-header">
+            <button class="back-btn" onclick="goBack()">←</button>
+            <h1>⚡ Quick Split</h1>
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </header>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <button class="quick-action-btn" onclick="startQuickSplit('equal')">
+                <span class="action-icon">⚖️</span>
+                <span class="action-text">Equal Split</span>
+            </button>
+            <button class="quick-action-btn" onclick="startQuickSplit('custom')">
+                <span class="action-icon">🔢</span>
+                <span class="action-text">Custom Split</span>
+            </button>
+            <button class="quick-action-btn" onclick="startQuickSplit('percentage')">
+                <span class="action-icon">📊</span>
+                <span class="action-text">Percentage</span>
+            </button>
+        </div>
+
+        <!-- Quick Split Form -->
+        <div class="quick-split-form" id="quickSplitForm" style="display: none;">
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="quickAmount">💰 Total Amount</label>
+                    <input type="number" id="quickAmount" placeholder="0.00" step="0.01" min="0" 
+                           oninput="calculateQuickSplit()">
+                </div>
+                
+                <div class="form-group">
+                    <label for="quickDescription">📝 Description</label>
+                    <input type="text" id="quickDescription" placeholder="What's this for?" 
+                           oninput="updateQuickSplit()">
+                </div>
+                
+                <div class="form-group">
+                    <label for="quickCategory">🏷️ Category</label>
+                    <select id="quickCategory" onchange="updateQuickSplit()">
+                        <option value="food">🍕 Food & Dining</option>
+                        <option value="groceries">🛒 Groceries</option>
+                        <option value="utilities">⚡ Utilities</option>
+                        <option value="rent">🏠 Rent</option>
+                        <option value="transport">🚗 Transport</option>
+                        <option value="entertainment">🎬 Entertainment</option>
+                        <option value="other">📦 Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Split Type Section -->
+            <div class="split-type-section" id="splitTypeSection">
+                <!-- Dynamic content based on split type -->
+            </div>
+
+            <!-- Participant Selection -->
+            <div class="participant-section">
+                <h3>👥 Who's involved?</h3>
+                <div class="participant-checkboxes" id="participantCheckboxes">
+                    <!-- Participant checkboxes will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Quick Results -->
+            <div class="quick-results" id="quickResults" style="display: none;">
+                <h3>💸 Split Results</h3>
+                <div class="results-grid" id="resultsGrid">
+                    <!-- Results will be displayed here -->
+                </div>
+                <div class="results-summary" id="resultsSummary">
+                    <!-- Summary will be displayed here -->
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="quick-split-actions">
+                <button class="btn-secondary" onclick="resetQuickSplit()">
+                    🔄 Reset
+                </button>
+                <button class="btn-primary" onclick="saveQuickSplit()" id="saveQuickSplitBtn" disabled>
+                    💾 Save Bill
+                </button>
+            </div>
+        </div>
+
+        <!-- Recent Quick Splits -->
+        <div class="recent-splits" id="recentSplits">
+            <div class="section-header">
+                <h3>📋 Recent Quick Splits</h3>
+                <button class="btn-sm" onclick="clearRecentSplits()">
+                    🗑️ Clear
+                </button>
+            </div>
+            <div class="recent-list" id="recentList">
+                <!-- Recent splits will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Split Modal -->
+    <div id="quickSplitModal" class="modal" style="display: none;">
+        <div class="modal-content quick-split-modal">
+            <div class="modal-header">
+                <h3>⚡ Quick Split Complete!</h3>
+                <button class="close-modal" onclick="closeQuickSplitModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="success-animation">✅</div>
+                <p id="modalMessage">Bill has been saved successfully!</p>
+                
+                <div class="modal-actions">
+                    <button class="btn-primary" onclick="closeQuickSplitModal()">
+                        👍 Great!
+                    </button>
+                    <button class="btn-secondary" onclick="createAnotherSplit()">
+                        ➕ Create Another
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/quick-split.js"></script>
+    <script src="js/theme.js"></script>
+</body>
+</html>
